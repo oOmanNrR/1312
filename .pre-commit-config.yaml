@@ -1,183 +1,29 @@
-openapi: 3.0.3
-info:
-  title: Product Rating API
-  description: API для управления рейтингами продуктов интернет-магазина.
-  version: 1.0.0
-servers:
-  - url: http://localhost:8000/api
-    description: Локальный сервер
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
 
-paths:
-  /products/{productId}/ratings:
-    get:
-      summary: Получить все оценки товара
-      parameters:
-        - name: productId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 123
-      responses:
-        '200':
-          description: Список оценок
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Rating'
-        '404':
-          description: Продукт не найден
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
 
-    post:
-      summary: Добавить оценку к товару
-      parameters:
-        - name: productId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 123
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateRatingRequest'
-      responses:
-        '201':
-          description: Оценка успешно создана
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rating'
-        '400':
-          description: Неверные данные (например, rating не от 1 до 5)
-        '409':
-          description: Пользователь уже оставил оценку для этого продукта
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
 
-  /ratings/{ratingId}:
-    put:
-      summary: Обновить оценку
-      parameters:
-        - name: ratingId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 456
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateRatingRequest'
-      responses:
-        '200':
-          description: Оценка успешно обновлена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rating'
-        '400':
-          description: Неверные данные
-        '403':
-          description: Нет прав на редактирование этой оценки
-        '404':
-          description: Оценка не найдена
+  - repo: https://github.com/pycqa/pylint
+    rev: v3.2.0
+    hooks:
+      - id: pylint
+        args: ["--disable=C0114,C0115,C0116,R0903,W0511"]  # отключаем докстринги и TODO-ворнинги
 
-  /products/{productId}/average-rating:
-    get:
-      summary: Получить средний рейтинг товара
-      parameters:
-        - name: productId
-          in: path
-          required: true
-          schema:
-            type: integer
-            example: 123
-      responses:
-        '200':
-          description: Средний рейтинг
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  average_rating:
-                    type: number
-                    format: float
-                    example: 4.7
-                  total_ratings:
-                    type: integer
-                    example: 15
-                required:
-                  - average_rating
-                  - total_ratings
-        '404':
-          description: Продукт не найден
-
-components:
-  schemas:
-    Rating:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 456
-        product_id:
-          type: integer
-          example: 123
-        user_id:
-          type: integer
-          example: 789
-        rating:
-          type: integer
-          minimum: 1
-          maximum: 5
-          example: 5
-        comment:
-          type: string
-          nullable: true
-          example: "Отличный продукт!"
-        created_at:
-          type: string
-          format: date-time
-          example: "2025-11-22T10:00:00Z"
-      required:
-        - id
-        - product_id
-        - user_id
-        - rating
-        - created_at
-
-    CreateRatingRequest:
-      type: object
-      properties:
-        rating:
-          type: integer
-          minimum: 1
-          maximum: 5
-          example: 4
-        comment:
-          type: string
-          nullable: true
-          example: "Хорошо, но можно лучше"
-      required:
-        - rating
-
-    UpdateRatingRequest:
-      type: object
-      properties:
-        rating:
-          type: integer
-          minimum: 1
-          maximum: 5
-          example: 5
-        comment:
-          type: string
-          nullable: true
-          example: "Обновил отзыв после тестирования"
-      required:
-        - rating
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        args: [--strict, --ignore-missing-imports]
+        additional_dependencies: [types-requests]
